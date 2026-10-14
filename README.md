@@ -1,38 +1,67 @@
 # TikTok Desktop
 
-A minimal Windows desktop wrapper that opens TikTok in its own app window instead of launching a separate browser.
+A Windows desktop wrapper for the official TikTok website. It has two separate builds:
 
-## Features
-- Opens the official `https://www.tiktok.com/` website.
-- No TikTok password is collected or stored by this project.
-- Electron's renderer has Node.js integration disabled, context isolation enabled, and sandboxing enabled.
-- Links outside TikTok are opened in the system browser rather than being loaded inside the app.
-- GitHub Actions can build a Windows installer (`.exe`).
+- **TikTok Desktop** — normal connection, like the original app.
+- **TikTok Desktop Proxy** — sends its Electron browser session through one explicitly configured proxy. It fails closed if the proxy is missing or invalid; it does not silently fall back to a direct connection.
 
 ## Requirements
+
 - Windows 10/11
 - Node.js 20 or newer (Node.js LTS recommended)
 
-## Run locally
+## Run the normal version
+
 ```bash
 npm install
 npm start
 ```
 
-## Build the Windows installer
+## Build the two separate Windows installers
+
 ```bash
-npm run dist
+npm install
+npm run dist:all
 ```
-The installer will be placed in `dist/`.
 
-## Build using GitHub Actions
-1. Push the project to the `main` branch.
-2. Open the repository's **Actions** tab and run **Build Windows EXE**, or push a commit to `main`.
-3. Open the completed workflow run and download the `TikTok-Desktop-Windows-Installer` artifact.
+The installers are output to `dist/normal/` and `dist/proxy/`. To build only one version, use `npm run dist:normal` or `npm run dist:proxy`.
 
-## Important limitations
-- This app displays TikTok's official website; it is not an official TikTok app.
-- TikTok may block or change behavior in embedded Chromium/Electron windows. If that happens, the app may need updating or TikTok may require its supported browser.
-- No software can honestly be guaranteed to always work or be immune to every attack. Keep Windows and dependencies updated, and only install builds you trust.
-- The app runs as a normal desktop process; it is not hidden from Task Manager, antivirus, or security monitoring.
-- This project does not bypass TikTok restrictions, ads, login requirements, or security controls.
+The builds use different application IDs and product names so they can be installed separately. Build artifacts have not been tested on every Windows machine.
+
+## Configure the proxy version
+
+The proxy build requires a proxy server you trust; the app does not provide or create a proxy service.
+
+1. Launch **TikTok Desktop Proxy** once. If no configuration exists, it creates a sample file and displays its location, then exits without connecting directly.
+2. Open that `proxy-config.json` file in a text editor.
+3. Replace the example with your actual proxy endpoint, for example:
+
+   ```json
+   {
+     "proxyRules": "http://proxy.example.com:8080"
+   }
+   ```
+
+   Or, if your provider explicitly gives you a SOCKS5 endpoint:
+
+   ```json
+   {
+     "proxyRules": "socks5://127.0.0.1:1080"
+   }
+   ```
+
+4. Save the file and reopen the proxy app.
+
+Use the exact host and port supplied by your proxy provider. This simple configuration does not support proxy credentials. Do not use a proxy you do not trust, and do not assume a proxy guarantees anonymity or prevents every attack. If the proxy is down or incorrectly configured, the proxy version will show an error and quit rather than silently connect directly.
+
+## Security notes
+
+- The app loads TikTok's official website; it is not an official TikTok app.
+- Renderer Node.js integration is disabled; context isolation and sandboxing are enabled.
+- Unneeded browser permissions are denied and untrusted navigation is blocked.
+- TLS certificate validation is not disabled.
+- The proxy setting applies to the Electron session used by the app; links opened in the system browser are handled by that browser and are not covered by the app's proxy.
+- A proxy changes the IP address seen by destinations only when traffic actually passes through that proxy. It does not by itself prevent attacks against your home Internet connection.
+- TikTok may change its site or restrict embedded Chromium/Electron windows.
+- No software can be guaranteed to always work or be immune to every attack.
+- The app is a normal desktop process, not hidden from Task Manager, antivirus, or security monitoring. This project does not bypass TikTok restrictions, ads, login requirements, or security controls.
