@@ -1,0 +1,16 @@
+appId: com.example.tiktokdesktop.proxy
+productName: TikTok Desktop Proxy
+directories:
+  output: dist/proxy
+files:
+  - src/**/*
+  - package.json
+win:
+  target: nsis
+nsis:
+  oneClick: false
+  allowToChangeInstallationDirectory: true
+  createDesktopShortcut: true
+  createStartMenuShortcut: true
+extraMetadata:
+  proxyMode: true
