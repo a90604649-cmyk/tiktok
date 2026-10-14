@@ -5,7 +5,6 @@
   "main": "src/main.js",
   "scripts": {
     "start": "electron .",
-    "start:proxy": "node scripts/start-proxy.js",
     "dist": "npm run dist:normal",
     "dist:normal": "electron-builder --config electron-builder.normal.yml --win nsis",
     "dist:proxy": "electron-builder --config electron-builder.proxy.yml --win nsis",
